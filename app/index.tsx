@@ -3,20 +3,30 @@ import FilterTabs from '@/components/FilterTabs'
 import Header from '@/components/Header'
 import TaskCard from '@/components/TaskCard'
 import Colors from '@/constants/Colors'
-import { FilterOptions, TASKS } from '@/constants/tasks'
+import { TASKS, TaskStatus } from '@/constants/tasks'
 import { StatusBar } from 'expo-status-bar'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FlatList, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 const Index = () => {
   const insets = useSafeAreaInsets()
 
-  const [activeFilter, setActiveFilter] = useState<FilterOptions>("All")
+  const [activeFilter, setActiveFilter] = useState<TaskStatus>("All")
+  const [filterData, setFilterData] = useState(TASKS);
+
+  useEffect(() => {
+    if (activeFilter === 'All') return setFilterData(TASKS)
+    const filterData = TASKS.filter(item => {
+      console.log(item.status.toLocaleLowerCase(), activeFilter.toLocaleLowerCase())
+      return item.status.toLocaleLowerCase() === activeFilter.toLocaleLowerCase()
+    })
+    setFilterData(filterData);
+  }, [activeFilter])
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar style='light' />
-      <FlatList data={TASKS} keyExtractor={(item) => item.id}
+      <FlatList data={filterData} keyExtractor={(item) => item.id}
 
         ListHeaderComponent={
           <>
